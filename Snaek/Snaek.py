@@ -85,42 +85,51 @@ def main():
         elif key[pygame.K_RIGHT] or key[pygame.K_d]:
             direction = "RIGHT"
 
+        delay = 0.2
 
         if direction == "UP":
-            yy += 1
-            try:
-                print(Xtuple[xx] + Ytuple[yy])
-            except:
-                print("death")
-                pass
-            time.sleep(0.5)
-
-        if direction == "DOWN":
             yy -= 1
             try:
                 print(Xtuple[xx] + Ytuple[yy])
             except:
                 print("death")
                 pass
-            time.sleep(0.5)
+            time.sleep(delay)
 
-        if direction == "LEFT":
-            xx += 1
+        elif direction == "DOWN":
+            yy += 1
             try:
                 print(Xtuple[xx] + Ytuple[yy])
             except:
                 print("death")
                 pass
-            time.sleep(0.5)
+            time.sleep(delay)
 
-        if direction == "RIGHT":
+        elif direction == "LEFT":
             xx -= 1
             try:
                 print(Xtuple[xx] + Ytuple[yy])
             except:
                 print("death")
                 pass
-            time.sleep(0.5)
+            time.sleep(delay)
+
+        elif direction == "RIGHT":
+            xx += 1
+            try:
+                print(Xtuple[xx] + Ytuple[yy])
+            except:
+                print("death")
+                pass
+            time.sleep(delay)
+
+# hear me out, variable * 25 + 1 (for calculating square coords) (ex. xx = 7 so 7 * 25 is 175 + 1 = 176) (then just add 25 to coords to make square)
+        xcoord = (xx * 25 + 1)
+        ycoord = (yy * 25 + 1)
+
+        coords = (xcoord, ycoord)
+
+        pygame.draw.rect(screen, white, (xcoord, ycoord, 25, 25))
 
         
 
