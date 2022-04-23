@@ -15,31 +15,32 @@
 import pygame, sys, os, pygame_menu, time, random
 from pygame.locals import *
 
+# ---- Variables ---- #
 black = (0, 0, 0)
 white = (255, 255, 255)
 
-snake = white # potential color swap feature implementation
+snake = white                                     # potential color swap feature implementation
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
+poslist = []
 
 window = (500, 500)
 (x, y) = window
 
-print(x)
-print(y)
-
+# ---- Initializing ---- #
 pygame.init()
 pygame.display.init()
 
 pygame.display.set_caption("Snaek Gaem")
 screen = pygame.display.set_mode(window)
 
-
+# ---- Main Function ---- #
 def main():
     print('Balls')
     screen.fill(black)
 
     global dirlist
+    global poslist
 
     n = 25
     f = 25
@@ -47,12 +48,9 @@ def main():
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
 
-    print(Xtuple[12] + Ytuple[12]) # THIS WORKS!
-
     # The range of the board is 20x20 grid, which means the coords are in range A-T and 1-20
-
-    # 25 pixel squares?
-    # getting a feel for the data
+    '''
+    # 25 pixel squares
     for s in range(20): # x axis
         pygame.draw.rect(screen, white, (0, n, y, 1))
         n += 25
@@ -60,6 +58,7 @@ def main():
     for m in range(20): # y axis
         pygame.draw.rect(screen, white, (f, 0, 1, x))
         f += 25
+    '''
 
     xx = 12
     yy = 12
@@ -67,8 +66,9 @@ def main():
     direction = "UP"                                    # Default Direction
     position = Xtuple[xx] + Ytuple[yy]                  # Outputs coord on grid (ex. M12)
 
+    '''
     testl = []
-    testl.append("bitches")
+    testl.append("bitches")                             # Testing list inserts
     testl.append("and bros")
     testl.append("and non binary hoes")
 
@@ -78,7 +78,9 @@ def main():
     testl.pop(2)
 
     print(testl)
+    '''
 
+# ---- Main gameloop ---- #
     running = True                                      # Game loop started
     while running:
 
@@ -88,6 +90,7 @@ def main():
 
         pygame.display.update()                         # Updates the screen with the visuals
 
+# ---- Input ---- #
         key = pygame.key.get_pressed()                  # Variable for easier calling
 
         if key[pygame.K_UP] or key[pygame.K_w] and dirlist[0] != "UP":         # Stores the last direction pressed
@@ -112,10 +115,9 @@ def main():
 
         direction = dirlist[0]
         prevdir = dirlist[1]
-        print(dirlist)
 
+# ---- Movement On Grid ---- #
         delay = 0.2
-
         if direction == "UP":                       # Constantly moving the snake on the coordinates logic (delay so it's managable and more like snake)
             if prevdir == "DOWN":                   # If up and if prevdir doesnt equal down go up
                 yy += 1
@@ -129,41 +131,35 @@ def main():
                # print("death")
                # pass
                 
-        elif direction == "DOWN":                   # If down and prevdir doesnt equal up go down
-            if prevdir == "UP":
-                yy -=1
+        elif direction == "DOWN":                   
+            if prevdir == "UP":                     # If the pressed direction is down and the previous direction is up, keep going up
+                yy -=1                              
                 time.sleep(delay)
             else:
-                yy += 1
+                yy += 1                             
                 time.sleep(delay)
 
-        elif direction == "LEFT":                   # If left and prevdir doesnt equal right go left
+        elif direction == "LEFT":                  
             if prevdir == "RIGHT":
-                xx += 1
+                xx += 1                             # Right (stops player from going back on themselves)
                 time.sleep(delay)
             else:
-                xx -= 1
+                xx -= 1                             # Left (direction they will go if not going backwards)
                 time.sleep(delay)
 
-        elif direction == "RIGHT":                  # If right and prevdir doesnt equal left go right
+        elif direction == "RIGHT":                
             if prevdir == "LEFT":
-                xx -= 1
+                xx -= 1                             
                 time.sleep(delay)
             else:
-                xx += 1
+                xx += 1                             
                 time.sleep(delay)
 
-        '''
-        try:
-            if dirlist[0] != dirlist[1]:
-                R = random.randrange(0, 255)
-                G = random.randrange(0, 255)
-                B = random.randrange(0, 255)
-
-                colour = (R, G, B)
-        except:
-            colour = white
-        '''
+# ---- Position Storing ---- # 
+        poslist.append(Xtuple[xx] + Ytuple[yy])
+        print(poslist)
+        
+        # need to track how long snake is so that the game can delete the squares outside the length
 
 # hear me out, variable * 25 + 1 (for calculating square coords) (ex. xx = 7 so 7 * 25 is 175 + 1 = 176) 
 # (then just add 25 to coords to make square)
