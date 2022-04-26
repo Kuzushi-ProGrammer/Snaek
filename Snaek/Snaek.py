@@ -18,9 +18,13 @@ from pygame.locals import *
 # ---- Variables ---- #
 black = (0, 0, 0)
 white = (255, 255, 255)
+red = (255, 0, 0)
 
 snake = white                                     # potential color swap feature implementation
 snakelen = 3
+_time = 0
+appcoords = (0, 0)
+
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
 poslist = []
@@ -36,6 +40,22 @@ pygame.display.init()
 pygame.display.set_caption("Snaek Gaem")
 screen = pygame.display.set_mode(window)
 
+def AppleSpawn():
+
+    global appcoords
+
+    xappgrid = random.randint(0, 19)
+    yappgrid = random.randint(0, 19)
+
+    xappcoord = xappgrid * 25
+    yappcoord = yappgrid * 25
+    appcoords = (xappcoord, yappcoord)
+
+    pygame.draw.rect(screen, red, (xappcoord, yappcoord, 25, 25))
+
+    
+
+
 # ---- Main Function ---- #
 def main():
     screen.fill(black)
@@ -44,6 +64,8 @@ def main():
     global poslist
     global coordlist
     global snakelen
+    global _time
+    global appcoords
 
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
@@ -65,6 +87,14 @@ def main():
                 running = False
 
         pygame.display.update()                         # Updates the screen with the visuals
+        _time += 0.1
+
+        delaytime = 3
+        if _time > delaytime:
+            AppleSpawn()
+            _time = 0
+        else: 
+            _time += 0.1
 
 # ---- Input ---- #
         key = pygame.key.get_pressed()                  # Variable for easier calling
@@ -127,34 +157,37 @@ def main():
         coords = (xcoord, ycoord)
 
         coordlist.insert(0, coords)
-        print(coordlist)
-
         poslist.insert(0, Xtuple[xx] + Ytuple[yy])
-        print(poslist)
 
-        head = coordlist[0]
-        tail = coordlist[snakelen]
-   
-        # need a way to determine end of tail (currently not working rn
-        # stops rendering after 3rd pos
-        # render head, unrender tail?
-        for x in poslist:
-            xindex = poslist.index(x)
-            if xindex > snakelen:
-                pygame.draw.rect(screen, white, (head, 25, 25))
-                pygame.draw.rect(screen, (69, 69, 69), (tail, 25, 25))
-                poslist.pop(snakelen)
-                coordlist.pop(snakelen)
-            elif xindex <= snakelen:
-                pygame.draw.rect(screen, white, (xcoord, ycoord, 25, 25))
+        sizetup = (25, 25)
+        try:
+            head = coordlist[0]                                     # Grabs the tuple of coords from the first position in the coordlist
+            tail = coordlist[snakelen]
+            head = head + sizetup                                   # Completes the rect argument
+            tail = tail + sizetup
 
+            for x in poslist:
+                xindex = poslist.index(x)
+                if xindex > snakelen:
+                    pygame.draw.rect(screen, white, head)
+                    poslist.pop(snakelen)
+                    coordlist.pop(snakelen)
+                elif xindex <= snakelen:
+                    pygame.draw.rect(screen, white, head)
+                    pygame.draw.rect(screen, black, tail)           # Screen, colour, rect
+        except:
+            print('ass')
+        
         poslist = poslist[0:snakelen]
+
+        if appcoords == coordlist[0]:
+            print('Apple gained!')
+            snakelen += 1
+
+            # Takes most recently added apple as the coords, basically its impossible to grow cause there's only one set of coordinates
+            # Make a list with all apple positions and then delete the ones that get grabbed
         
-        # Need a coord list for all the parts
         
-        # if coord equals negative:
-            # die
- 
 
 def menu():
 
