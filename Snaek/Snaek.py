@@ -24,7 +24,8 @@ grey = (69, 69, 69)
 snakecolour = (255, 255, 255)                                     # potential color swap feature implementation
 snakelen = 3
 _time = 0
-appcoords = (0, 0)
+appcoords = []
+apples = 0
 
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
@@ -44,15 +45,21 @@ screen = pygame.display.set_mode(window)
 def AppleSpawn():
 
     global appcoords
+    global apples
 
-    xappgrid = random.randint(0, 19)
-    yappgrid = random.randint(0, 19)
+    if apples < 5:
+        xappgrid = random.randint(0, 19)
+        yappgrid = random.randint(0, 19)
 
-    xappcoord = xappgrid * 25
-    yappcoord = yappgrid * 25
-    appcoords = (xappcoord, yappcoord)
+        xappcoord = xappgrid * 25
+        yappcoord = yappgrid * 25
+        xycoords = (xappcoord, yappcoord)
+        appcoords.append(xycoords)
 
-    pygame.draw.rect(screen, red, (xappcoord, yappcoord, 25, 25))
+        pygame.draw.rect(screen, red, (xappcoord, yappcoord, 25, 25))
+        apples += 1
+    else:
+        pass
 
     
 
@@ -67,6 +74,7 @@ def main():
     global snakelen
     global _time
     global appcoords
+    global apples
 
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
@@ -88,8 +96,8 @@ def main():
                 running = False
 
         pygame.display.update()                         # Updates the screen with the visuals
+        
         _time += 0.1
-
         delaytime = 3
         if _time > delaytime:
             AppleSpawn()
@@ -181,8 +189,11 @@ def main():
         
         poslist = poslist[0:snakelen]
 
-        if appcoords == coordlist[0]:
+        if coordlist[0] in appcoords:
             print('Apple gained!')
+            apple = appcoords.index(coordlist[0])
+            appcoords.pop(apple)
+            apples -= 1
             snakelen += 1
 
             # Takes most recently added apple as the coords, basically its impossible to grow cause there's only one set of coordinates
