@@ -19,8 +19,9 @@ from pygame.locals import *
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
+grey = (69, 69, 69)
 
-snake = white                                     # potential color swap feature implementation
+snakecolour = (255, 255, 255)                                     # potential color swap feature implementation
 snakelen = 3
 _time = 0
 appcoords = (0, 0)
@@ -186,17 +187,40 @@ def main():
 
             # Takes most recently added apple as the coords, basically its impossible to grow cause there's only one set of coordinates
             # Make a list with all apple positions and then delete the ones that get grabbed
-        
-        
+def quitf():
+    pygame.quit()
+
+def colourmenu():
+
+    global snakecolour
+
+    # need a way to input rgb / hex values
+
+    ccustomtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
+    ccustomtheme.background_color = black
+
+    cmenu = pygame_menu.Menu('Colour Select', x, y, theme = ccustomtheme)
+
+    cmenu.add.text_input('Colour 1: ', default = '', input_underline = '_')
+    cmenu.add.text_input('Colour 2: ', default = '',  input_underline = '_')
+
+    # displays colour choice
+
+    cmenu.add.button('Back', menu)
+    cmenu.mainloop(screen)
+
+  
 
 def menu():
 
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
 
-    menu = pygame_menu.Menu('Python', x, y, theme = customtheme)
+    menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
     menu.add.button('Play', main)
+    menu.add.button('Colour Select', colourmenu)
+    menu.add.button('Quit', quitf)
     menu.mainloop(screen)
 
 # Function calling
