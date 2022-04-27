@@ -23,7 +23,7 @@ red = (255, 0, 0)
 snake = white                                     # potential color swap feature implementation
 snakelen = 3
 _time = 0
-appcoords = (0, 0)
+appcoords = []
 
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
@@ -49,7 +49,8 @@ def AppleSpawn():
 
     xappcoord = xappgrid * 25
     yappcoord = yappgrid * 25
-    appcoords = (xappcoord, yappcoord)
+    xycoords = (xappcoord, yappcoord)
+    appcoords.append(xycoords)
 
     pygame.draw.rect(screen, red, (xappcoord, yappcoord, 25, 25))
 
@@ -180,9 +181,12 @@ def main():
         
         poslist = poslist[0:snakelen]
 
-        if appcoords == coordlist[0]:
+        if coordlist[0] in appcoords:
             print('Apple gained!')
+            apple = appcoords.index(coordlist[0])
+            appcoords.pop(apple)
             snakelen += 1
+        print(appcoords)
 
             # Takes most recently added apple as the coords, basically its impossible to grow cause there's only one set of coordinates
             # Make a list with all apple positions and then delete the ones that get grabbed
