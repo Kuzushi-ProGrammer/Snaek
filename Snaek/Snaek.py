@@ -14,6 +14,8 @@
 # If player runs into wall, die
 import pygame, sys, os, pygame_menu, time, random
 from pygame.locals import *
+from pygame_menu.widgets.core.widget import Widget
+from pygame_menu._types import EventVectorType
 
 # ---- Variables ---- #
 black = (0, 0, 0)
@@ -21,11 +23,12 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 grey = (69, 69, 69)
 
-snakecolour = (255, 255, 255)                                     # potential color swap feature implementation
 snakelen = 3
 _time = 0
 appcoords = []
 apples = 0
+c1 = (255, 255, 255)
+c2 = (0, 0, 0)
 
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
@@ -203,7 +206,19 @@ def quitf():
 
 def colourmenu():
 
+    def color1(colour):
+        global c1
+        c1 = colour
+        print(c1)
+
+    def color2(colour):
+        global c2
+        c2 = colour
+        print(c2)
+
     global snakecolour
+    global c1
+    global c2
 
     # need a way to input rgb / hex values
 
@@ -211,14 +226,30 @@ def colourmenu():
     ccustomtheme.background_color = black
 
     cmenu = pygame_menu.Menu('Colour Select', x, y, theme = ccustomtheme)
+    widg = pygame_menu.widgets.core.widget.Widget
 
-    cmenu.add.text_input('Colour 1: ', default = '', input_underline = '_')
-    cmenu.add.text_input('Colour 2: ', default = '',  input_underline = '_')
+    cmenu.add.text_input('Colour 1: ', 
+                         default = '', 
+                         input_underline = '.', 
+                         maxchar = 15, 
+                         copy_paste_enable = True, 
+                         cursor_selection_enable = True,
+                         onchange = color1
+                         )   
 
-    # displays colour choice
-
+    cmenu.add.text_input('Colour 2: ',
+                         default = '', 
+                         input_underline = '.', 
+                         maxchar = 15, 
+                         copy_paste_enable = True, 
+                         cursor_selection_enable = True,
+                         onchange = color2
+                         )
+    
     cmenu.add.button('Back', menu)
     cmenu.mainloop(screen)
+
+
 
   
 
