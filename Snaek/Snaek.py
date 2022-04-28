@@ -29,6 +29,7 @@ appcoords = []
 apples = 0
 c1 = (255, 255, 255)
 c2 = (0, 0, 0)
+colpair = []
 
 
 dirlist = ["UP", "UP"]                            # assigning list and default value
@@ -209,12 +210,27 @@ def colourmenu():
     def color1(colour):
         global c1
         c1 = colour
-        print(c1)
 
     def color2(colour):
         global c2
         c2 = colour
-        print(c2)
+
+    def colcheck(c):
+        global colpair
+        global i
+        if '#' in c and len(c) <= 6:
+            # Type is hex value
+            i = pygame.Color(c)
+            colpair.append(i)
+        elif '(' and ')' in c:
+            # Type is RGB value
+            i = c.strip('()')
+            colpair.append(i)
+        else:
+            i = c
+            colpair.append(i)
+            print(colpair)
+
 
     global snakecolour
     global c1
@@ -231,22 +247,34 @@ def colourmenu():
     cmenu.add.text_input('Colour 1: ', 
                          default = '', 
                          input_underline = '.', 
-                         maxchar = 15, 
+                         maxwidth_dynamically_update = True, 
                          copy_paste_enable = True, 
                          cursor_selection_enable = True,
                          onchange = color1
+                         
                          )   
 
     cmenu.add.text_input('Colour 2: ',
                          default = '', 
                          input_underline = '.', 
-                         maxchar = 15, 
+                         maxwidth_dynamically_update = True, 
                          copy_paste_enable = True, 
                          cursor_selection_enable = True,
                          onchange = color2
                          )
     
     cmenu.add.button('Back', menu)
+
+    key = pygame.key.get_pressed()
+    if key[pygame.K_SPACE]:
+        print('space!')
+        try:
+            colcheck(c1)
+            colcheck(c2)
+        except:
+            print('bitches')
+
+
     cmenu.mainloop(screen)
 
 
