@@ -30,12 +30,14 @@ snakelen = 3                                        # All the global variables (
 _time = 0                                           # If the variable has a value, that's the default value, either to avoid errors or for mandatory initial values
 apples = 0
 appcoords = []
-colpair = []
+colpair = ["", ""]
 dirlist = ["UP", "UP"]                              
 poslist = []
 coordlist = []
 c1 = (255, 255, 255)
 c2 = (0, 0, 0)
+
+drawsquare1 = False
 
 # ---- Window Config ---- #
 window = (500, 500)
@@ -81,6 +83,8 @@ def main():                                         # Handles all of the gamepla
     global _time
     global appcoords
     global apples
+    global colpair
+    global drawsquare1
 
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
@@ -204,6 +208,9 @@ def main():                                         # Handles all of the gamepla
             apples -= 1                                             # Decreases the apples integer by one so more apples can spawn (Line 57)
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
 
+
+
+
 # ---- Quit Button Function ---- #
 def quitf():                                                        # When you press quit on the game menu, the game quits
     pygame.quit()
@@ -212,99 +219,57 @@ def quitf():                                                        # When you p
 def colourmenu():                                                   # Colour menu function (supposed to be sub menu of main menu) (research that)
 
     #---- Input Function ---- #
-    def color1(c):                                             # Takes the value from the input text and assigns it to c1
-        global colpair        
+    def color1(c):                                                  # Takes the value from the input text and assigns it to c1
+        global colpair 
+        global drawsquare1
 
-        if len(c) <= 7:                                     # Checks for hex value in text input
+        if len(c) <= 7:                                             # Checks for hex value in text input
             # Type is hex value
             if '#' in c:
-                i = pygame.Color(c)
-                i = i[:3]
-                colpair.insert(0, i)
+                i = pygame.Color(c)                                 # Converts hex value to RGBA
+                i = i[:3]                                           # Removes opacity value
+                colpair[0] = i
                 print('hex')
-            elif '#' not in c:
+            elif '#' not in c:                                      # Same functionality just adds a hashtag so that the conversion works
                 # Type is hex value without hash
                 i = c
                 i = '#' + i
-                try:
+                try:                                                
                     i = pygame.Color(i)
                     i = i[:3]
-                    colpair.insert(0, i)
+                    colpair[0] = i
                     print('hex without hash')
-                except:
-                    # Fallback for short strings
+                except:                                             
+                    # Fallback for invalid colour / input
                     print('Invalid Colour')
 
-        elif ',' in c:                                      # Checks for brackets in RGB
+        elif ',' in c:                                              # Checks for brackets in RGB
            # Type is RGB value
            if '(' and ')' in c:
                 # Type is RGB value with brackets
                 i = c
-                colpair.insert(0, i)
-                print('rgb w/ brackets')                                                   # If no # or () then assume RGB
-           elif '(' or ')' not in c:
+                colpair[0] = i
+                print('rgb w/ brackets')                            # If no # or () then assume RGB
+           elif '(' or ')' not in c:                                # Currently the difference doesn't do anything as I havent implemented the draw feature yet
                # Type is RGB value without brackets
                i = c
-               colpair.insert(0, i)
+               colpair[0] = i
                print('rgb w/o brackets')
         else:
             # Fallback if neither Hex nor RGB
-            print('Not valid input')
-
-        if len(colpair) > 2:
-            colpair.pop(0)                                          # CANT COPY PASTE USE PYWIN32 AND WIN32CLIPBOARD
+            print('Not valid input')                                # For copy paste functionality use pywin32 and win32clipboard
         print(colpair)
-        print(len(colpair))
 
-    # ---- Second Input Function ---- #
-    def color2(c):
-        global colpair        
+        print("funcfin")
+        drawsquare1 = True
 
-        if len(c) <= 7:                                     # Checks for hex value in text input
-            # Type is hex value
-            if '#' in c:
-                i = pygame.Color(c)
-                i = i[:3]
-                colpair.insert(1, i)
-                print('hex')
-            elif '#' not in c:
-                # Type is hex value without hash
-                i = c
-                i = '#' + i
-                try:
-                    i = pygame.Color(i)
-                    i = i[:3]
-                    colpair.insert(1, i)
-                    print('hex without hash')
-                except:
-                    # Fallback for short strings
-                    print('Invalid Colour')
-
-        elif ',' in c:                                      # Checks for brackets in RGB
-           # Type is RGB value
-           if '(' and ')' in c:
-                # Type is RGB value with brackets
-                i = c
-                colpair.insert(1, i)
-                print('rgb w/ brackets')                                                   # If no # or () then assume RGB
-           elif '(' or ')' not in c:
-               # Type is RGB value without brackets
-               i = c
-               colpair.insert(1, i)
-               print('rgb w/o brackets')
-        else:
-            # Fallback if neither Hex nor RGB
-            print('Not valid input')
-
-        if len(colpair) > 2:
-            colpair.pop(0)                                          # CANT COPY PASTE USE PYWIN32 AND WIN32CLIPBOARD
-        print(colpair)
-        print(len(colpair))
+    # ---- Second Input Function (copy paste later) ---- #                             # Duplicate function for second text input
 
     # ---- Menu setup ---- #
     global snakecolour
     global c1
-    global c2
+    # global c2
+    global drawsquare1
 
     ccustomtheme = pygame_menu.themes.THEME_SOLARIZED.copy()                        # Copies the solarized theme and assigns it to a variable (cause I don't know how to do from scratch)
     ccustomtheme.background_color = black                                           # Sets the background of the theme variable to black
@@ -313,29 +278,25 @@ def colourmenu():                                                   # Colour men
     widg = pygame_menu.widgets.core.widget.Widget
 
     cmenu.add.text_input('Colour 1: ', 
-                         default = '', 
-                         input_underline = '.', 
-                         maxwidth_dynamically_update = True, 
-                         copy_paste_enable = True, 
-                         cursor_selection_enable = True,
-                         onreturn = color1
-                         
-                         )   
+                            default = '', 
+                            input_underline = '.', 
+                            maxwidth_dynamically_update = True, 
+                            copy_paste_enable = True, 
+                            cursor_selection_enable = True,
+                            onreturn = color1         
+                            )   
 
     cmenu.add.text_input('Colour 2: ',
-                         default = '', 
-                         input_underline = '.', 
-                         maxwidth_dynamically_update = True, 
-                         copy_paste_enable = True, 
-                         cursor_selection_enable = True,
-                         onreturn = color2
-                         )
-    
+                            default = '', 
+                            input_underline = '.', 
+                            maxwidth_dynamically_update = True, 
+                            copy_paste_enable = True, 
+                            cursor_selection_enable = True,
+                            # onreturn = color2
+                            )
+
     cmenu.add.button('Back', menu)
     cmenu.mainloop(screen)
-
-
-
   
 # ---- Main Menu Function ---- #
 def menu():
