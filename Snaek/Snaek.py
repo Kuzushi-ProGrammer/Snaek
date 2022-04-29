@@ -49,6 +49,7 @@ pygame.display.init()
 
 pygame.display.set_caption("Snaek Gaem")            # Setting window name
 screen = pygame.display.set_mode(window)            # Setting window size
+surface = pygame.Surface((500, 500))
 
 # ---- Apple Coordinates ---- #
 def AppleSpawn():
@@ -260,9 +261,14 @@ def colourmenu():                                                   # Colour men
             print('Not valid input')                                # For copy paste functionality use pywin32 and win32clipboard
         print(colpair)
 
-        print("funcfin")
-        drawsquare1 = True
+        try:
+            drawsquare1 = True
+            pygame.draw.rect(surface, colpair[0], (250, 100, 50, 50))
+            print("drawn")
+        except:
+            print("NO")
 
+        print("funcfin")
     # ---- Second Input Function (copy paste later) ---- #                             # Duplicate function for second text input
 
     # ---- Menu setup ---- #
