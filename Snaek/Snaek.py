@@ -219,63 +219,14 @@ def quitf():                                                        # When you p
 # ---- Colour Selection Menu Function ---- #
 def colourmenu():                                                   # Colour menu function (supposed to be sub menu of main menu) (research that)
 
-    #---- Input Function ---- #
-    def color1(c):                                                  # Takes the value from the input text and assigns it to c1
-        global colpair 
-        global drawsquare1
-
-        if len(c) <= 7:                                             # Checks for hex value in text input
-            # Type is hex value
-            if '#' in c:
-                i = pygame.Color(c)                                 # Converts hex value to RGBA
-                i = i[:3]                                           # Removes opacity value
-                colpair[0] = i
-                print('hex')
-            elif '#' not in c:                                      # Same functionality just adds a hashtag so that the conversion works
-                # Type is hex value without hash
-                i = c
-                i = '#' + i
-                try:                                                
-                    i = pygame.Color(i)
-                    i = i[:3]
-                    colpair[0] = i
-                    print('hex without hash')
-                except:                                             
-                    # Fallback for invalid colour / input
-                    print('Invalid Colour')
-
-        elif ',' in c:                                              # Checks for brackets in RGB
-           # Type is RGB value
-           if '(' and ')' in c:
-                # Type is RGB value with brackets
-                i = c
-                colpair[0] = i
-                print('rgb w/ brackets')                            # If no # or () then assume RGB
-           elif '(' or ')' not in c:                                # Currently the difference doesn't do anything as I havent implemented the draw feature yet
-               # Type is RGB value without brackets
-               i = c
-               colpair[0] = i
-               print('rgb w/o brackets')
-        else:
-            # Fallback if neither Hex nor RGB
-            print('Not valid input')                                # For copy paste functionality use pywin32 and win32clipboard
-        print(colpair)
-
-        try:
-            drawsquare1 = True
-            pygame.draw.rect(surface, colpair[0], (250, 100, 50, 50))
-            print("drawn")
-        except:
-            print("NO")
-
-        print("funcfin")
-    # ---- Second Input Function (copy paste later) ---- #                             # Duplicate function for second text input
+    def colour_1(c):
+        print('bitch')
+    def colour_2(c):
+        print('asshole')
 
     # ---- Menu setup ---- #
     global snakecolour
-    global c1
-    # global c2
-    global drawsquare1
+ 
 
     ccustomtheme = pygame_menu.themes.THEME_SOLARIZED.copy()                        # Copies the solarized theme and assigns it to a variable (cause I don't know how to do from scratch)
     ccustomtheme.background_color = black                                           # Sets the background of the theme variable to black
@@ -283,22 +234,12 @@ def colourmenu():                                                   # Colour men
     cmenu = pygame_menu.Menu('Colour Select', x, y, theme = ccustomtheme)           
     widg = pygame_menu.widgets.core.widget.Widget
 
-    cmenu.add.text_input('Colour 1: ', 
-                            default = '', 
-                            input_underline = '.', 
-                            maxwidth_dynamically_update = True, 
-                            copy_paste_enable = True, 
-                            cursor_selection_enable = True,
-                            onreturn = color1         
+    cmenu.add.color_input(  title = 'Colour 1: ', 
+                            color_type = ('rgb'),
                             )   
 
-    cmenu.add.text_input('Colour 2: ',
-                            default = '', 
-                            input_underline = '.', 
-                            maxwidth_dynamically_update = True, 
-                            copy_paste_enable = True, 
-                            cursor_selection_enable = True,
-                            # onreturn = color2
+    cmenu.add.color_input(  title = 'Colour 2: ',
+                            color_type = ('rgb'),
                             )
 
     cmenu.add.button('Back', menu)
