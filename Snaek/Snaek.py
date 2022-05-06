@@ -73,6 +73,12 @@ def scorewriting():
 
     score_file.close()
 
+# ---- Changing the Difficulty ---- #
+def change_speed(selected_value, difficulty, **kwargs):
+    global diff_tuple
+    diff_tuple, index = selected_value
+    print(diff_tuple)
+
 # ---- Apple Coordinates ---- #
 def AppleSpawn():
 
@@ -111,6 +117,7 @@ def main():                                         # Handles all of the gamepla
     global apples
     global colpair
     global applescollected
+    global diff_tuple
 
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
@@ -130,6 +137,9 @@ def main():                                         # Handles all of the gamepla
     applescollected = 0
     apples = 0
 
+    delay = diff_tuple[1]                              # How long between checks for movement are made 
+                                                       # Lower = Faster, More responsive  
+                                                       # Higher = Slower, Less responsive
     # ---- Main Loop ---- #
     running = True                                      # Game loop started
     while running:
@@ -172,9 +182,6 @@ def main():                                         # Handles all of the gamepla
         prevdir = dirlist[1]                            # Prevdir is the last direction you were moving in
 
         # ---- Grid Movement ---- #
-        delay = 0.1                                     # How long between checks for movement are made 
-                                                        # Lower = Faster, More responsive  
-                                                        # Higher = Slower, Less responsive
         if direction == "UP":                           # Constantly moving the snake on the coordinates logic (delay so it's managable and more like snake)
             if prevdir == "DOWN":                       # If up and if prevdir doesnt equal down go up
                 yy += 1
@@ -247,8 +254,6 @@ def main():                                         # Handles all of the gamepla
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
             applescollected += 1
 
-        
-
         if alive == False:
             scorewriting()
             menu()
@@ -268,6 +273,11 @@ def menu():
     menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
     menu.add.label(f'Most Apples Collected: {highscore}')
+    menu.add.selector( title = "Difficulty: ",
+                       items = [('Easy', 0.5), ('Medium', 0.1), ('Hard', 0.05)],
+                       onchange = change_speed,
+                       onreturn = change_speed
+                     )
     menu.add.button('Play', main)
     menu.add.button('Quit', quitf)
     menu.mainloop(screen)
