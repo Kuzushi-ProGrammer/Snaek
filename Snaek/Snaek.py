@@ -26,7 +26,7 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 grey = (69, 69, 69)
 
-snakelen = 3                                        # All the global variables (Types (In order): Int, List, Tuple)                                        
+snakelen = 3                                        # All the global variables (Types (In order): Int, List, Tuple, Bool, String)                                        
 _time = 0                                           # If the variable has a value, that's the default value, either to avoid errors or for mandatory initial values
 apples = 0
 applescollected = 0
@@ -51,13 +51,27 @@ pygame.display.set_caption("Snaek Gaem")            # Setting window name
 screen = pygame.display.set_mode(window)            # Setting window size
 surface = pygame.Surface((500, 500))
 
-try:
-    score_file = open("Score.txt", "x")
-    score_file = open("Score.txt", "r")
-    applesstr = score_file.readline()
-except:
-    score_file = open("Score.txt", "r")
-    applesstr = score_file.readline()
+# ---- Writing down the score ---- #
+def scorewriting():
+    global highscore
+
+    try:
+        score_file = open("score.txt", "x")
+        score_file = open("score.txt", "w")
+        score_file.write('0')
+    except:
+        pass
+
+    score_file = open("score.txt", "r")
+    highscore = score_file.read()
+    print(highscore)
+    if int(highscore) < applescollected:
+        score_file = open("score.txt", "w")
+        score_file.write(str(applescollected))
+        score_file = open("score.txt", "r")
+        highscore = score_file.read()
+
+    score_file.close()
 
 # ---- Apple Coordinates ---- #
 def AppleSpawn():
@@ -111,6 +125,10 @@ def main():                                         # Handles all of the gamepla
     position = Xtuple[xx] + Ytuple[yy]                  # Outputs coord on grid (ex. M12)
 
     alive = True
+
+    snakelen = 3
+    applescollected = 0
+    apples = 0
 
     # ---- Main Loop ---- #
     running = True                                      # Game loop started
@@ -193,6 +211,7 @@ def main():                                         # Handles all of the gamepla
             poslist.insert(0, Xtuple[xx] + Ytuple[yy])              # Gets a list of all the positions of the snake squares
         except:
             print("death")
+            scorewriting()
             menu()                                                  # Placeholder game over for now (need to make game over screen)
 
         sizetup = (25, 25)                                          # Tuple for rect argument completion
@@ -201,10 +220,6 @@ def main():                                         # Handles all of the gamepla
             tail = coordlist[snakelen]                              # Grabs the tuple of coords from the last position in the coordinate list
             head = head + sizetup                                   # Completes the rect argument with the last two arguments in sizetup
             tail = tail + sizetup
-
-            print(coordlist[0])
-            print(coordlist[snakelen])
-            print(poslist)
 
             for x in poslist:                                       # For every square in the snake:
                 xindex = poslist.index(x)                           # Takes the index of the current element in the position list
@@ -222,22 +237,20 @@ def main():                                         # Handles all of the gamepla
                 alive = False
 
         except:                                                     
-            print('Not lengthy enough')                             # Fallback for first three ticks
+            pass
         
         # ---- Apple Spawning ---- #
         if coordlist[0] in appcoords:                               # If the snake head ends up in the same spot as an apple:
-            print('Apple gained!')                                  # Maybe play a sound once I implement them
             apple = appcoords.index(coordlist[0])                   # Grabs the coordinates that matched the head and apple placement
             appcoords.pop(apple)                                    # Deletes those coordinates from the list of apples
             apples -= 1                                             # Decreases the apples integer by one so more apples can spawn (Line 57)
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
             applescollected += 1
 
+        
+
         if alive == False:
-
-            score_file.write(str(applescollected))
-            applesstr = score_file.readline()
-
+            scorewriting()
             menu()
 
 
@@ -245,44 +258,22 @@ def main():                                         # Handles all of the gamepla
 def quitf():                                                        # When you press quit on the game menu, the game quits
     pygame.quit()
 
-# ---- Colour Selection Menu Function ---- #
-def colourmenu():                                                   # Colour menu function (supposed to be sub menu of main menu) (research that) 
-
-    ccustomtheme = pygame_menu.themes.THEME_SOLARIZED.copy()                        # Copies the solarized theme and assigns it to a variable (cause I don't know how to do from scratch)
-    ccustomtheme.background_color = black                                           # Sets the background of the theme variable to black
-
-    cmenu = pygame_menu.Menu('Colour Select', x, y, theme = ccustomtheme)           
-    widg = pygame_menu.widgets.core.widget.Widget
-
-    cmenu.add.color_input(  title = 'Colour 1: ', 
-                            color_type = ('rgb'),
-                            )   
-
-    cmenu.add.color_input(  title = 'Colour 2: ',
-                            color_type = ('rgb'),
-                            )
-
-    cmenu.add.button('Back', menu)
-    cmenu.mainloop(screen)
-  
 # ---- Main Menu Function ---- #
 def menu():
-
-    global applesstr
+    global highscore
 
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
 
     menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
-    menu.add.label(f'Most Apples Collected: {applesstr}')
+    menu.add.label(f'Most Apples Collected: {highscore}')
     menu.add.button('Play', main)
-    menu.add.button('Colour Select', colourmenu)
     menu.add.button('Quit', quitf)
     menu.mainloop(screen)
 
 # Function calling
-    
+scorewriting()
 menu()
 
 pygame.quit()
