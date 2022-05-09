@@ -19,6 +19,8 @@ import pygame, sys, os, pygame_menu, time, random
 from pygame.locals import *
 from pygame_menu.widgets.core.widget import Widget
 from pygame_menu._types import EventVectorType
+from pydub import AudioSegment
+from pydub.playback import play
 
 # ---- Variables ---- #
 black = (0, 0, 0)                                   # Calling colour variables up here for easier access
@@ -35,8 +37,6 @@ colpair = ["", ""]
 dirlist = ["UP", "UP"]                              
 poslist = []
 coordlist = []
-c1 = (255, 255, 255)
-c2 = (0, 0, 0)
 alive = False
 
 # ---- Window Config ---- #
@@ -50,6 +50,8 @@ pygame.display.init()
 pygame.display.set_caption("Snaek Gaem")            # Setting window name
 screen = pygame.display.set_mode(window)            # Setting window size
 surface = pygame.Surface((500, 500))
+
+path = os.getcwd()
 
 # ---- Writing down the score ---- #
 def scorewriting():
@@ -130,14 +132,21 @@ def main():                                         # Handles all of the gamepla
 
     direction = "UP"                                    # Default Direction
     position = Xtuple[xx] + Ytuple[yy]                  # Outputs coord on grid (ex. M12)
-
     alive = True
-
-    snakelen = 3
-    applescollected = 0
+    snakelen = 3                                        # All the global variables (Types (In order): Int, List, Tuple, Bool, String)                                        
+    _time = 0                                           # If the variable has a value, that's the default value, either to avoid errors or for mandatory initial values
     apples = 0
+    applescollected = 0
+    appcoords = []
+    colpair = ["", ""]
+    dirlist = ["UP", "UP"]                              
+    poslist = []
+    coordlist = []
 
-    delay = diff_tuple[1]                              # How long between checks for movement are made 
+    try:
+        delay = diff_tuple[1]                              # How long between checks for movement are made 
+    except:
+        delay = 0.1
                                                        # Lower = Faster, More responsive  
                                                        # Higher = Slower, Less responsive
     # ---- Main Loop ---- #
@@ -253,6 +262,7 @@ def main():                                         # Handles all of the gamepla
             apples -= 1                                             # Decreases the apples integer by one so more apples can spawn (Line 57)
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
             applescollected += 1
+            play(AudioSegment.from_wav("8bit-coin-sound-effect.wav"))
 
         if alive == False:
             scorewriting()
