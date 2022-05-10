@@ -19,8 +19,6 @@ import pygame, sys, os, pygame_menu, time, random
 from pygame.locals import *
 from pygame_menu.widgets.core.widget import Widget
 from pygame_menu._types import EventVectorType
-from pydub import AudioSegment
-from pydub.playback import play
 
 # ---- Variables ---- #
 black = (0, 0, 0)                                   # Calling colour variables up here for easier access
@@ -50,8 +48,6 @@ pygame.display.init()
 pygame.display.set_caption("Snaek Gaem")            # Setting window name
 screen = pygame.display.set_mode(window)            # Setting window size
 surface = pygame.Surface((500, 500))
-
-path = os.getcwd()
 
 # ---- Writing down the score ---- #
 def scorewriting():
@@ -262,7 +258,6 @@ def main():                                         # Handles all of the gamepla
             apples -= 1                                             # Decreases the apples integer by one so more apples can spawn (Line 57)
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
             applescollected += 1
-            play(AudioSegment.from_wav("8bit-coin-sound-effect.wav"))
 
         if alive == False:
             scorewriting()
