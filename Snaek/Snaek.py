@@ -268,6 +268,21 @@ def main():                                         # Handles all of the gamepla
 def quitf():                                                        # When you press quit on the game menu, the game quits
     pygame.quit()
 
+def settingsmenu():
+    customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
+    customtheme.background_color = black
+
+    menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
+
+    menu.add.label('Press Enter to Confirm Difficulty')
+    menu.add.selector( title = "Difficulty: ",
+                       items = [('Easy', 0.5), ('Medium', 0.1), ('Hard', 0.05)],
+                       onchange = change_speed,
+                       onreturn = change_speed
+                     )
+    menu.add.button('Back', menu)
+    menu.mainloop(screen)
+
 # ---- Main Menu Function ---- #
 def menu():
     global highscore
@@ -278,12 +293,8 @@ def menu():
     menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
     menu.add.label(f'Most Apples Collected: {highscore}')
-    menu.add.selector( title = "Difficulty: ",
-                       items = [('Easy', 0.5), ('Medium', 0.1), ('Hard', 0.05)],
-                       onchange = change_speed,
-                       onreturn = change_speed
-                     )
     menu.add.button('Play', main)
+    menu.add.button('Settings', settingsmenu)
     menu.add.button('Quit', quitf)
     menu.mainloop(screen)
 
