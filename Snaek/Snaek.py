@@ -11,14 +11,12 @@
 # Make player longer                (DONE)
 # Apple limit                       (DONE)
 
-# If player runs over square, die   (Not implemented)
-# If player runs into wall, die     (Partially done)
+# If player runs over square, die   (DONE)
+# If player runs into wall, die     (DONE)
 
 # ---- Imports ---- #
-import pygame, sys, os, pygame_menu, time, random
+import pygame, pygame_menu, time, random
 from pygame.locals import *
-from pygame_menu.widgets.core.widget import Widget
-from pygame_menu._types import EventVectorType
 
 # ---- Variables ---- #
 black = (0, 0, 0)                                   # Calling colour variables up here for easier access
@@ -31,7 +29,6 @@ _time = 0                                           # If the variable has a valu
 apples = 0
 applescollected = 0
 appcoords = []
-colpair = ["", ""]
 dirlist = ["UP", "UP"]                              
 poslist = []
 coordlist = []
@@ -53,32 +50,31 @@ surface = pygame.Surface((500, 500))
 def scorewriting():
     global highscore
 
-    try:
-        score_file = open("score.txt", "x")
-        score_file = open("score.txt", "w")
+    try:                                            # If the file doesn't exist, create it and write '0' to it for default new score
+        score_file = open("score.txt", "x")         # Creates new text file named score
+        score_file = open("score.txt", "w")         # Prepares file for writing
         score_file.write('0')
     except:
         pass
 
-    score_file = open("score.txt", "r")
-    highscore = score_file.read()
-    print(highscore)
-    if int(highscore) < applescollected:
-        score_file = open("score.txt", "w")
+    score_file = open("score.txt", "r")             # Prepares the file for reading
+    highscore = score_file.read()                   # Reads the file
+
+    if int(highscore) < applescollected:            # If the already written highscore is less than the score after the player dies,
+        score_file = open("score.txt", "w")         # overwrite the previous score with the current one
         score_file.write(str(applescollected))
         score_file = open("score.txt", "r")
         highscore = score_file.read()
 
-    score_file.close()
+    score_file.close()                              # Closes file as I don't need it anymore and for security(?) reasons (not like I need it but good practice)
 
 # ---- Changing the Difficulty ---- #
-def change_speed(selected_value, difficulty, **kwargs):
+def change_speed(selected_value, difficulty, **kwargs): # Calls function off of the difficulty menu (Line 271)
     global diff_tuple
     diff_tuple, index = selected_value
-    print(diff_tuple)
 
 # ---- Apple Coordinates ---- #
-def AppleSpawn():
+def AppleSpawn():                                  
 
     global appcoords                                # Makes sure the variables can be accessed by other functions
     global apples
@@ -95,8 +91,6 @@ def AppleSpawn():
         pygame.draw.rect(screen, red, (xappcoord, yappcoord, 25, 25)) # Draws a red square on the randomly selected coordinates
         apples += 1                                                   # Integer counting number of apples on screen is added to
 
-        #return apples, appcoords
-
     else:
         pass
 
@@ -104,16 +98,15 @@ def AppleSpawn():
 def main():                                         # Handles all of the gameplay
     # ---- Setup ---- #
     screen.fill(black)                              # Fills the screen black for the game space
-
-    global alive
-    global dirlist                                  # Global variables
-    global poslist                                  # There is a lot of them as this is the main game loop
+                                                     
+    global alive                                    # Global variables 
+    global dirlist                                  
+    global poslist                                  
     global coordlist
     global snakelen
     global _time
     global appcoords
     global apples
-    global colpair
     global applescollected
     global diff_tuple
 
@@ -123,28 +116,33 @@ def main():                                         # Handles all of the gamepla
     # The range of the board is 20x20 grid, which means the coords are in range A-T and 1-20
     # The two lists of tuples used to get the coordinates on a square grid
     
-    xx = 12                                             # Index in Xtuple
-    yy = 12                                             # Index in Ytuple
+    # ---- Resetting Variables on Game Start ---- #
+    xx = 12                                             # Index in Xtuple (XAxis on Grid)
+    yy = 12                                             # Index in Ytuple (YAxis on Grid)
 
-    direction = "UP"                                    # Default Direction
-    position = Xtuple[xx] + Ytuple[yy]                  # Outputs coord on grid (ex. M12)
-    alive = True
-    snakelen = 3                                        # All the global variables (Types (In order): Int, List, Tuple, Bool, String)                                        
-    _time = 0                                           # If the variable has a value, that's the default value, either to avoid errors or for mandatory initial values
-    apples = 0
-    applescollected = 0
-    appcoords = []
-    colpair = ["", ""]
-    dirlist = ["UP", "UP"]                              
-    poslist = []
-    coordlist = []
+    poslist = []                                        # List of Grid Coordinates
+    coordlist = []                                      # List of Pixel Coordinates for the grid spaces
+
+    direction = "UP"                                    # Current Direction
+    prevdir = "UP"                                      # Previous Direction
+    dirlist = ["UP", "UP"]                              # List for the current diretion and previous direction
+
+    alive = True                                        # Bool for determining wether the snake is alive or not
+    snakelen = 3                                        # Default Length of the Snake  
+    
+    _time = 0                                           # Time passed
+    delaytime = 3                                       # Integer for the Delay between the Spawning of Apples
+    apples = 0                                          # Integer for Number of Apples On-Screen
+    applescollected = 0                                 # Integer for Number of Apples Collected
+    appcoords = []                                      # List of Apple Coordinates
 
     try:
-        delay = diff_tuple[1]                              # How long between checks for movement are made 
+        delay = diff_tuple[1]                           # Integer for how long between checks for movement are made
     except:
-        delay = 0.1
-                                                       # Lower = Faster, More responsive  
-                                                       # Higher = Slower, Less responsive
+        delay = 0.1                                     # Default Value
+        # Lower = Faster, More responsive  
+        # Higher = Slower, Less responsive
+
     # ---- Main Loop ---- #
     running = True                                      # Game loop started
     while running:
@@ -157,7 +155,6 @@ def main():                                         # Handles all of the gamepla
 
         # ---- Time ---- #
         _time += 0.1                                    # Every time it loops, adds 0.1 to the time
-        delaytime = 3                                   # The amount of seconds wished to delay the apple spawn
         if _time > delaytime:                           # Checks if the current time is greater than the wished delay time
             AppleSpawn()                                # Calls AppleSpawn function (Line 49)
             _time = 0                                   # Resets time to 0 to repeat
@@ -165,7 +162,7 @@ def main():                                         # Handles all of the gamepla
             _time += 0.1                                # Wait this is actually 0.2 seconds per loop?? (look into later)
 
         # ---- User Input ---- #
-        key = pygame.key.get_pressed()                                          # Variable for easier calling
+        key = pygame.key.get_pressed()                  # Variable for easier calling
 
         if key[pygame.K_UP] or key[pygame.K_w] and dirlist[0] != "UP":          # Checks which key was pressed and disallows backwards keypresses (No up -> down)
             dirlist.insert(0, "UP")                                             # Inserts whatever direction was pressed into a list
@@ -218,7 +215,7 @@ def main():                                         # Handles all of the gamepla
         ycoord = (yy * 25)
         coords = (xcoord, ycoord)                                   # Packs them into a tuple for inserting into a pixel coordinate list
 
-        coordlist.insert(0, coords)                                 # Inserts the pixel coordinates into a list
+        coordlist.insert(0, coords)                                 # Inserts the pixel coordinates into a list (coordlist)
         try:                                                        # Temporary Try Except statement to prevent crashes
             poslist.insert(0, Xtuple[xx] + Ytuple[yy])              # Gets a list of all the positions of the snake squares
         except:
@@ -243,8 +240,9 @@ def main():                                         # Handles all of the gamepla
                     pygame.draw.rect(screen, white, head)           # Draw head position white and draw tail position black
                     pygame.draw.rect(screen, black, tail)           # rect(surface, colour, rect(dist from top, dist from left, pixels down, pixels left)) (I think)
 
-            if coordlist[0] in poslist:                             # death
-                alive = False
+            if poslist[0] in poslist[1:]:                               # Poslist is the coordinate position on the grid and coordlist is those positions translated
+                alive = False                                       # into pixel coordinates
+                print('death be upon ye')
             if coordlist[0][0] < 0 or coordlist[0][1] < 0:
                 alive = False
 
