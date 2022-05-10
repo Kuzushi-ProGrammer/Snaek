@@ -270,7 +270,7 @@ def settingsmenu():
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
 
-    smenu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
+    smenu = pygame_menu.Menu('Settings', x, y, theme = customtheme)
 
     smenu.add.label('Press Enter to Confirm Difficulty')
     smenu.add.selector( title = "Difficulty: ",
