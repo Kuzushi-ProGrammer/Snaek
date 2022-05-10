@@ -272,16 +272,16 @@ def settingsmenu():
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
 
-    menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
+    smenu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
-    menu.add.label('Press Enter to Confirm Difficulty')
-    menu.add.selector( title = "Difficulty: ",
-                       items = [('Easy', 0.5), ('Medium', 0.1), ('Hard', 0.05)],
+    smenu.add.label('Press Enter to Confirm Difficulty')
+    smenu.add.selector( title = "Difficulty: ",
+                       items = [('Snail', 0.25), ('Snake', 0.1), ('Hawk', 0.05)],
                        onchange = change_speed,
                        onreturn = change_speed
                      )
-    menu.add.button('Back', menu)
-    menu.mainloop(screen)
+    smenu.add.button('Back', menu) 
+    smenu.mainloop(screen)
 
 # ---- Main Menu Function ---- #
 def menu():
