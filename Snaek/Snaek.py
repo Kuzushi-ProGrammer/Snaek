@@ -15,6 +15,8 @@
 # If player runs into wall, die     (DONE)
 
 # ---- Imports ---- #
+from cProfile import label
+from tkinter import font
 import pygame, pygame_menu, time, random
 from pygame.locals import *
 
@@ -69,17 +71,22 @@ def scorewriting():
     score_file.close()                              # Closes file as I don't need it anymore and for security(?) reasons (not like I need it but good practice)
 
 # ---- Changing the Difficulty ---- #
-def change_speed(selected_value, difficulty, **kwargs): # Calls function off of the difficulty menu (Line 271)
-    global diff_tuple
-    diff_tuple, index = selected_value
+def change_speed(selected_value, speed, **kwargs): # Calls function off of the difficulty menu (Line 271)
+    global speed_tuple
+    speed_tuple, index = selected_value
+
+def change_apples(selected_value, apples, **kwargs):
+    global apple_tuple
+    apple_tuple, index = selected_value
 
 # ---- Apple Coordinates ---- #
 def AppleSpawn():                                  
 
     global appcoords                                # Makes sure the variables can be accessed by other functions
     global apples
+    global applemaximum
 
-    if apples < 5:                                  # Enables me to set a limit of the number of apples on screen at once 
+    if apples < applemaximum:                       # Enables me to set a limit of the number of apples on screen at once 
         xappgrid = random.randint(0, 19)            # Generates two random numbers for the grid squares (Tuples on Line 83-84 as reference)
         yappgrid = random.randint(0, 19)
 
@@ -108,7 +115,9 @@ def main():                                         # Handles all of the gamepla
     global appcoords
     global apples
     global applescollected
-    global diff_tuple
+    global speed_tuple
+    global apple_tuple
+    global applemaximum
 
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
@@ -132,16 +141,20 @@ def main():                                         # Handles all of the gamepla
     
     _time = 0                                           # Time passed
     delaytime = 3                                       # Integer for the Delay between the Spawning of Apples
-    apples = 0                                          # Integer for Number of Apples On-Screen
+    apples = 0                                          # Integer for Number of Apples Currently On-Screen
     applescollected = 0                                 # Integer for Number of Apples Collected
     appcoords = []                                      # List of Apple Coordinates
 
     try:
-        delay = diff_tuple[1]                           # Integer for how long between checks for movement are made
+        delay = speed_tuple[1]                          # Integer for how long between checks for movement are made
     except:
         delay = 0.1                                     # Default Value
         # Lower = Faster, More responsive  
         # Higher = Slower, Less responsive
+    try:
+        applemaximum = apple_tuple[1]                   # Integer for Maximum Number of Apples Allowed On-Screen
+    except:
+        applemaximum = 3
 
     # ---- Main Loop ---- #
     running = True                                      # Game loop started
@@ -219,9 +232,7 @@ def main():                                         # Handles all of the gamepla
         try:                                                        # Temporary Try Except statement to prevent crashes
             poslist.insert(0, Xtuple[xx] + Ytuple[yy])              # Gets a list of all the positions of the snake squares
         except:
-            print("death")
-            scorewriting()
-            menu()                                                  # Placeholder game over for now (need to make game over screen)
+            alive = False
 
         sizetup = (25, 25)                                          # Tuple for rect argument completion
         try:
@@ -240,9 +251,8 @@ def main():                                         # Handles all of the gamepla
                     pygame.draw.rect(screen, white, head)           # Draw head position white and draw tail position black
                     pygame.draw.rect(screen, black, tail)           # rect(surface, colour, rect(dist from top, dist from left, pixels down, pixels left)) (I think)
 
-            if poslist[0] in poslist[1:]:                               # Poslist is the coordinate position on the grid and coordlist is those positions translated
+            if poslist[0] in poslist[1:]:                           # Poslist is the coordinate position on the grid and coordlist is those positions translated
                 alive = False                                       # into pixel coordinates
-                print('death be upon ye')
             if coordlist[0][0] < 0 or coordlist[0][1] < 0:
                 alive = False
 
@@ -261,10 +271,33 @@ def main():                                         # Handles all of the gamepla
             scorewriting()
             menu()
 
+        try:
+            # Draws rectangle on "dead pixel" *ba dum shh*
+            pygame.draw.rect(screen, grey, (coordlist[-1][0], coordlist[-1][1], 25, 25)) # For some reason M11 stays in list and also kills the player and i do not know why
+        except:
+            pass
 
 # ---- Quit Button Function ---- #
 def quitf():                                                        # When you press quit on the game menu, the game quits
     pygame.quit()
+
+def contmenu():
+    customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
+    customtheme.background_color = black
+
+    cmenu = pygame_menu.Menu('How to Play', x, y, theme = customtheme)
+
+    cmenu.add.label('How to Play:', font_size=36, underline=True)
+    cmenu.add.label('Use the W A S D KEYS  or ARROW KEYS to move.', font_size=16)
+    cmenu.add.label('You cannot go backwards on yourself or run into yourself, you will die.', font_size=14)
+    cmenu.add.label('You are consistently moving, so stay on your toes.', font_size=16)
+    cmenu.add.label('Oh also avoid the grey square, it will kill you as well.', font_size=16)
+    cmenu.add.label('Have fun!', font_size=20)
+
+    cmenu.add.button('Back', menu, font_size=24)
+
+    cmenu.mainloop(screen)
+
 
 def settingsmenu():
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
@@ -272,12 +305,18 @@ def settingsmenu():
 
     smenu = pygame_menu.Menu('Settings', x, y, theme = customtheme)
 
-    smenu.add.label('Press Enter to Confirm Difficulty')
-    smenu.add.selector( title = "Difficulty: ",
-                       items = [('Snail', 0.25), ('Snake', 0.1), ('Hawk', 0.05)],
+    smenu.add.label('Press Enter to Confirm', font_size=24)
+    smenu.add.selector( title = "Speed: ", font_size=20,
+                       items = [('Snake', 0.1), ('Hawk', 0.05), ('Snail', 0.25)],
                        onchange = change_speed,
                        onreturn = change_speed
                      )
+    smenu.add.selector( title = "Apple Density: ", font_size=20,
+                       items = [('Dinner', 3), ('Snack', 1), ('Buffet', 5)],
+                       onchange = change_apples,
+                       onreturn = change_apples
+                     )
+
     smenu.add.button('Back', menu) 
     smenu.mainloop(screen)
 
@@ -291,9 +330,10 @@ def menu():
     menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
 
     menu.add.label(f'Most Apples Collected: {highscore}')
-    menu.add.button('Play', main)
-    menu.add.button('Settings', settingsmenu)
-    menu.add.button('Quit', quitf)
+    menu.add.button('Play', main, font_size=24)
+    menu.add.button('How to Play', contmenu, font_size=24)
+    menu.add.button('Settings', settingsmenu, font_size=24)
+    menu.add.button('Quit', quitf, font_size=24)
     menu.mainloop(screen)
 
 # Function calling
