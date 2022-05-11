@@ -14,9 +14,11 @@
 # If player runs over square, die   (DONE)
 # If player runs into wall, die     (DONE)
 
+# Difficulty Settings     (OPTIONAL)(DONE)
+# How-To-Play Menu                  (DONE)
+# Death Square                 (???)(DONE)  
+
 # ---- Imports ---- #
-from cProfile import label
-from tkinter import font
 import pygame, pygame_menu, time, random
 from pygame.locals import *
 
@@ -48,7 +50,7 @@ pygame.display.set_caption("Snaek Gaem")            # Setting window name
 screen = pygame.display.set_mode(window)            # Setting window size
 surface = pygame.Surface((500, 500))
 
-# ---- Writing down the score ---- #
+# ---- Writing the Highscore to File ---- #
 def scorewriting():
     global highscore
 
@@ -71,11 +73,11 @@ def scorewriting():
     score_file.close()                              # Closes file as I don't need it anymore and for security(?) reasons (not like I need it but good practice)
 
 # ---- Changing the Difficulty ---- #
-def change_speed(selected_value, speed, **kwargs): # Calls function off of the difficulty menu (Line 271)
+def change_speed(selected_value, speed, **kwargs):  # Calls function off of the settings menu (Speed option Line 271)
     global speed_tuple
     speed_tuple, index = selected_value
 
-def change_apples(selected_value, apples, **kwargs):
+def change_apples(selected_value, apples, **kwargs):# Calls function off of the settings menu (Apple Density option Line 312) 
     global apple_tuple
     apple_tuple, index = selected_value
 
@@ -119,6 +121,7 @@ def main():                                         # Handles all of the gamepla
     global apple_tuple
     global applemaximum
 
+    # ---- Grid Values ---- #
     Xtuple = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T")
     Ytuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")
 
@@ -172,7 +175,7 @@ def main():                                         # Handles all of the gamepla
             AppleSpawn()                                # Calls AppleSpawn function (Line 49)
             _time = 0                                   # Resets time to 0 to repeat
         else:                                           # If the time is less than the delay time, it adds 0.1 to the time
-            _time += 0.1                                # Wait this is actually 0.2 seconds per loop?? (look into later)
+            _time += 0.1                               
 
         # ---- User Input ---- #
         key = pygame.key.get_pressed()                  # Variable for easier calling
@@ -223,14 +226,14 @@ def main():                                         # Handles all of the gamepla
 
         time.sleep(delay)
 
-        # ---- Position Storing ---- #
+        # ---- Position Storing and Drawing ---- #
         xcoord = (xx * 25)                                          # Calculates the position on the screen in pixels based off the grid potition
         ycoord = (yy * 25)
         coords = (xcoord, ycoord)                                   # Packs them into a tuple for inserting into a pixel coordinate list
 
         coordlist.insert(0, coords)                                 # Inserts the pixel coordinates into a list (coordlist)
-        try:                                                        # Temporary Try Except statement to prevent crashes
-            poslist.insert(0, Xtuple[xx] + Ytuple[yy])              # Gets a list of all the positions of the snake squares
+        try:                                                        # Try Except statement to prevent crashes
+            poslist.insert(0, Xtuple[xx] + Ytuple[yy])              # Gets a list of all the positions of the snake squares on the Grid
         except:
             alive = False
 
@@ -244,16 +247,16 @@ def main():                                         # Handles all of the gamepla
             for x in poslist:                                       # For every square in the snake:
                 xindex = poslist.index(x)                           # Takes the index of the current element in the position list
                 if xindex > snakelen:                               # If the index is greater than the set length of the snake
-                    pygame.draw.rect(screen, white, head)           # Draw the square in the designated position
-                    poslist.pop(snakelen)                           # Delete the position list entry and coordinate list entry of the max set length of the snake 
+                    pygame.draw.rect(screen, white, head)           # Draw the square in the position of the snakes head
+                    poslist.pop(snakelen)                           # Delete the position list entry and coordinate list entry of last square of the snake 
                     coordlist.pop(snakelen)                         # (ex. max snake length = 2 so both lists have 3 entries in them)
                 elif xindex <= snakelen:                            # If none of that shenanigains happens:
                     pygame.draw.rect(screen, white, head)           # Draw head position white and draw tail position black
                     pygame.draw.rect(screen, black, tail)           # rect(surface, colour, rect(dist from top, dist from left, pixels down, pixels left)) (I think)
 
-            if poslist[0] in poslist[1:]:                           # Poslist is the coordinate position on the grid and coordlist is those positions translated
-                alive = False                                       # into pixel coordinates
-            if coordlist[0][0] < 0 or coordlist[0][1] < 0:
+            if poslist[0] in poslist[1:]:                           # Checks if there is any matching values in the position list and if there is, kill snake
+                alive = False                                       
+            if coordlist[0][0] < 0 or coordlist[0][1] < 0:          # If the head coordinates of the snake are in the negative, it's out of bounds, so kill the snake
                 alive = False
 
         except:                                                     
@@ -267,10 +270,12 @@ def main():                                         # Handles all of the gamepla
             snakelen += 1                                           # Increases the maximum set length of the snake by 1
             applescollected += 1
 
+        # ---- Vibe Check ---- #
         if alive == False:
-            scorewriting()
-            menu()
+            scorewriting()                                          # Writes score to file using function
+            menu()                                                  # Exits back to menu
 
+        # ---- Dead Pixel ---- #
         try:
             # Draws rectangle on "dead pixel" *ba dum shh*
             pygame.draw.rect(screen, grey, (coordlist[-1][0], coordlist[-1][1], 25, 25)) # For some reason M11 stays in list and also kills the player and i do not know why
@@ -281,6 +286,7 @@ def main():                                         # Handles all of the gamepla
 def quitf():                                                        # When you press quit on the game menu, the game quits
     pygame.quit()
 
+# ---- How To Play Menu Function ---- #
 def contmenu():
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
@@ -298,7 +304,7 @@ def contmenu():
 
     cmenu.mainloop(screen)
 
-
+# ---- Settings Menu Function ---- #
 def settingsmenu():
     customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
     customtheme.background_color = black
@@ -306,10 +312,10 @@ def settingsmenu():
     smenu = pygame_menu.Menu('Settings', x, y, theme = customtheme)
 
     smenu.add.label('Press Enter to Confirm', font_size=24)
-    smenu.add.selector( title = "Speed: ", font_size=20,
-                       items = [('Snake', 0.1), ('Hawk', 0.05), ('Snail', 0.25)],
-                       onchange = change_speed,
-                       onreturn = change_speed
+    smenu.add.selector( title = "Speed: ", font_size=20,                         # Adds a selector bar with three speed difficulties
+                       items = [('Snake', 0.1), ('Hawk', 0.05), ('Snail', 0.25)],# Items on the selector go here, in list form
+                       onchange = change_speed,                                  # Calls the change speed function when the difficulty is changed
+                       onreturn = change_speed                                   # or when enter is pressed
                      )
     smenu.add.selector( title = "Apple Density: ", font_size=20,
                        items = [('Dinner', 3), ('Snack', 1), ('Buffet', 5)],
@@ -324,16 +330,16 @@ def settingsmenu():
 def menu():
     global highscore
 
-    customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()
-    customtheme.background_color = black
+    customtheme = pygame_menu.themes.THEME_SOLARIZED.copy()             # Copies theme
+    customtheme.background_color = black                                # Changes the background black
 
-    menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)
+    menu = pygame_menu.Menu('Snaek', x, y, theme = customtheme)         # Sets the title of menu to 'Snaek'
 
-    menu.add.label(f'Most Apples Collected: {highscore}')
-    menu.add.button('Play', main, font_size=24)
-    menu.add.button('How to Play', contmenu, font_size=24)
-    menu.add.button('Settings', settingsmenu, font_size=24)
-    menu.add.button('Quit', quitf, font_size=24)
+    menu.add.label(f'Most Apples Collected: {highscore}')               # Uses text to display player's high score
+    menu.add.button('Play', main, font_size=24)                         # When clicked, executes the main game loop
+    menu.add.button('How to Play', contmenu, font_size=24)              # When clicked, goes to how to play menu
+    menu.add.button('Settings', settingsmenu, font_size=24)             # When clicked, goes to settings menu
+    menu.add.button('Quit', quitf, font_size=24)                        # When clicked, quits the game
     menu.mainloop(screen)
 
 # Function calling
